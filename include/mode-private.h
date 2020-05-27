@@ -107,6 +107,15 @@ typedef unsigned int ( *__mode_get_num_entries )( const Mode *sw );
 /**
  * @param sw The #Mode pointer
  *
+ * Get the preselected line number.
+ *
+ * @returns the preselected line number.
+ */
+typedef unsigned int ( *__mode_get_preselected_line)( const Mode *sw );
+
+/**
+ * @param sw The #Mode pointer
+ *
  * Destroy the current mode. Still ready to restart.
  *
  */
@@ -166,6 +175,8 @@ struct rofi_mode
     __mode_destroy          _destroy;
     /** Get number of entries to display. (unfiltered). */
     __mode_get_num_entries  _get_num_entries;
+    /** Get the preselected line **/
+    __mode_get_preselected_line  _get_preselected_line;
     /** Process the result of the user selection. */
     _mode_result            _result;
     /** Token match. */

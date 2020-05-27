@@ -192,12 +192,16 @@ static void run_switcher ( ModeMode mode )
     curr_switcher = mode;
     RofiViewState * state = rofi_view_create ( modi[mode], config.filter, 0, process_result );
 
-    // User can pre-select a row.
+    // User can pre-select a row for dmenu mode
     if ( find_arg ( "-selected-row" ) >= 0 ){
 	unsigned int sr = 0;
 	find_arg_uint (  "-selected-row", &(sr) );
 	rofi_view_set_selected_line ( state, sr );
     }
+
+    // User can preselect a row for script mode
+    rofi_view_set_selected_line( state, mode_get_preselected_line ( modi[mode] ) );
+
     if ( state ) {
         rofi_view_set_active ( state );
     }
@@ -234,6 +238,7 @@ void process_result ( RofiViewState *state )
         }
         else if ( retv == RESET_DIALOG ) {
             rofi_view_clear_input ( state );
+            rofi_view_set_selected_line ( state, mode_get_preselected_line( modi[mode] ) );
         }
         else if ( retv < MODE_EXIT ) {
             mode = ( retv ) % num_modi;

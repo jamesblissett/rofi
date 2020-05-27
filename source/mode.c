@@ -60,6 +60,13 @@ unsigned int mode_get_num_entries ( const Mode *mode )
     return mode->_get_num_entries ( mode );
 }
 
+unsigned int mode_get_preselected_line ( const Mode *mode )
+{
+    g_assert ( mode != NULL );
+    g_assert ( mode->_get_preselected_line != NULL );
+    return mode->_get_preselected_line ( mode );
+}
+
 char * mode_get_display_value ( const Mode *mode, unsigned int selected_line, int *state, GList **attribute_list, int get_entry )
 {
     g_assert ( mode != NULL );

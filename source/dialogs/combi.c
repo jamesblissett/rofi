@@ -135,6 +135,11 @@ static unsigned int combi_mode_get_num_entries ( const Mode *sw )
     }
     return length;
 }
+// preselection is disabled in combi-mode
+static unsigned int combi_mode_get_preselected_line ( const Mode *sw )
+{
+    return 0;
+}
 static void combi_mode_destroy ( Mode *sw )
 {
     CombiModePrivateData *pd = (CombiModePrivateData *) mode_get_private_data ( sw );
@@ -312,6 +317,7 @@ Mode combi_mode =
     .cfg_name_key       = "display-combi",
     ._init              = combi_mode_init,
     ._get_num_entries   = combi_mode_get_num_entries,
+    ._get_preselected_line = combi_mode_get_preselected_line,
     ._result            = combi_mode_result,
     ._destroy           = combi_mode_destroy,
     ._token_match       = combi_mode_match,

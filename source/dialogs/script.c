@@ -64,6 +64,8 @@ typedef struct
     /** Active list */
     struct rofi_range_pair * active_list;
     unsigned int           num_active_list;
+    /** Preselected line **/
+    unsigned int           preselected_line;
     /** Configuration settings. */
     char                   *message;
     char                   *prompt;
@@ -142,6 +144,9 @@ static void parse_header_entry ( Mode *sw, char *line, ssize_t length )
         }
         else if ( strcasecmp ( line, "active" ) == 0 ) {
             parse_ranges ( value, &( pd->active_list ), &( pd->num_active_list ) );
+        }
+        else if ( strcasecmp ( line, "selected" ) == 0 ) {
+            pd->preselected_line = (int) strtol( value, NULL, 10 ) - 1;
         }
         else if ( strcasecmp ( line, "delim" ) == 0 ) {
             pd->delim = helper_parse_char ( value );
@@ -253,6 +258,7 @@ static int script_mode_init ( Mode *sw )
 {
     if ( sw->private_data == NULL ) {
         ScriptModePrivateData *pd = g_malloc0 ( sizeof ( *pd ) );
+        pd->preselected_line = 0;
 		pd->delim        = '\n';
         sw->private_data = (void *) pd;
         pd->cmd_list     = execute_executor ( sw, NULL, &( pd->cmd_list_length ), 0, NULL );
@@ -263,6 +269,15 @@ static unsigned int script_mode_get_num_entries ( const Mode *sw )
 {
     const ScriptModePrivateData *rmpd = (const ScriptModePrivateData *) sw->private_data;
     return rmpd->cmd_list_length;
+}
+
+static unsigned int script_mode_get_preselected_line ( const Mode *sw )
+{
+    ScriptModePrivateData *rmpd = (ScriptModePrivateData *) sw->private_data;
+    // reset the preselected line to 0 after one use
+    unsigned int preselected_line = rmpd->preselected_line;
+    rmpd->preselected_line = 0;
+    return preselected_line;
 }
 
 static void script_mode_reset_highlight ( Mode *sw )
@@ -381,6 +396,7 @@ static char *_get_display_value ( const Mode *sw, unsigned int selected_line, G_
             *state |= URGENT;
         }
     }
+
     if ( pd->do_markup ) {
         *state |= MARKUP;
     }
@@ -446,17 +462,18 @@ Mode *script_switcher_parse_setup ( const char *str )
     }
     g_free ( parse );
     if ( index == 2 ) {
-        sw->free               = script_switcher_free;
-        sw->_init              = script_mode_init;
-        sw->_get_num_entries   = script_mode_get_num_entries;
-        sw->_result            = script_mode_result;
-        sw->_destroy           = script_mode_destroy;
-        sw->_token_match       = script_token_match;
-        sw->_get_message       = script_get_message;
-        sw->_get_icon          = script_get_icon;
-        sw->_get_completion    = NULL,
-        sw->_preprocess_input  = NULL,
-        sw->_get_display_value = _get_display_value;
+        sw->free                  = script_switcher_free;
+        sw->_init                 = script_mode_init;
+        sw->_get_num_entries      = script_mode_get_num_entries;
+        sw->_get_preselected_line = script_mode_get_preselected_line;
+        sw->_result               = script_mode_result;
+        sw->_destroy              = script_mode_destroy;
+        sw->_token_match          = script_token_match;
+        sw->_get_message          = script_get_message;
+        sw->_get_icon             = script_get_icon;
+        sw->_get_completion       = NULL,
+        sw->_preprocess_input     = NULL,
+        sw->_get_display_value    = _get_display_value;
 
         return sw;
     }

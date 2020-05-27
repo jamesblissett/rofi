@@ -112,6 +112,15 @@ unsigned int mode_get_num_entries ( const Mode *mode );
 
 /**
  * @param mode The mode to query
+ *
+ * Get the preselected line number.
+ *
+ * @returns an unsigned int with the preselected line number.
+ */
+unsigned int mode_get_preselected_line ( const Mode *mode );
+
+/**
+ * @param mode The mode to query
  * @param selected_line The entry to query
  * @param state The state of the entry [out]
  * @param attribute_list List of extra (pango) attribute to apply when displaying. [out][null]
